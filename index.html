@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Académique : Infrastructure Réseau Windows Server — Conception, Sécurisation et Gouvernance</title>
+    <!-- Intégration de Mermaid pour les diagrammes -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true, theme:'neutral'});</script>
+    <!-- Styles CSS -->
+    <style>
+        /* Définition des polices et variables */
+        :root {
+            --color-primary: #1a365d; /* Bleu foncé pour les titres */
+            --color-secondary: #2d3748; /* Gris foncé pour sous-titres */
+            --color-accent: #2b6cb0; /* Bleu accent pour concepts clés */
+            --color-law: #c53030; /* Rouge pour les lois mentales */
+            --color-illusion: #b7791f; /* Or pour illusions conceptuelles */
+            --color-background: #ffffff;
+            --color-surface: #f7fafc;
+            --color-border: #e2e8f0;
+            --font-heading: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+            --font-body: 'Source Sans 3', 'Inter', 'Open Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.7;
+            color: var(--color-secondary);
+            background-color: var(--color-background);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a {
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+
+        /* Header */
+        .page-header {
+            background-color: var(--color-primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 5px solid var(--color-accent);
+        }
+
+        .page-header h1 {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Navigation principale */
+        #main-nav {
+            background-color: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-family: var(--font-heading);
+            font-weight: bold;
+            color: var(--color-primary);
+            font-size: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: var(--color-secondary);
+            font-weight: 600;
+            padding: 1rem 0;
+            display: block;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .nav-menu a:hover, .nav-menu a:focus {
+            color: var(--color-accent);
+        }
+
+        .nav-menu a.active {
+            color: var(--color-accent);
+            border-bottom: 3px solid var(--color-accent);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .hamburger span {
+            height: 3px;
+            width: 25px;
+            background-color: var(--color-primary);
+            border-radius: 2px;
+        }
+
+        /* Contenu principal en deux colonnes */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Sidebar / Navigation latérale */
+        #sidebar {
+            width: 280px;
+            background-color: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            padding: 2rem 1rem;
+            position: sticky;
+            top: 80px; /* Hauteur de la nav principale */
+            align-self: flex-start;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-title {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            color: var(--color-primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--color-accent);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            color: var(--color-secondary);
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover, .sidebar-nav a:focus, .sidebar-nav a.active-section {
+            background-color: rgba(43, 108, 176, 0.1);
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        /* Zone de contenu principal */
+        #content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .module-section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 100px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 2.5rem;
+            border: 1px solid var(--color-border);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .section-header h2 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background-color: var(--color-accent);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        /* Styles typographiques spécifiques */
+        h3 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--color-secondary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        h4 {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            color: var(--color-secondary);
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1.5rem;
+        }
+
+        ul, ol {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Éléments de mise en forme sémantique */
+        .analogy-box {
+            background-color: rgba(247, 250, 252, 0.8);
+            border-left: 4px solid var(--color-accent);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .concept-key {
+            color: var(--color-accent);
+            font-weight: 700;
+            background-color: rgba(43, 108, 176, 0.1);
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+        }
+
+        .law-box {
+            background-color: rgba(197, 48, 48, 0.05);
+            border-left: 4px solid var(--color-law);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .illusion-box {
+            background-color: rgba(183, 121, 31, 0.05);
+            border-left: 4px solid var(--color-illusion);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .equation-box {
+            text-align: center;
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            background-color: var(--color-surface);
+            border-radius: 8px;
+            border: 1px dashed var(--color-border);
+        }
+
+        .mermaid-diagram {
+            margin: 2rem 0;
+            padding: 1rem;
+            background-color: white;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        /* Objectifs cognitifs */
+        .cognitive-objectives {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #2c5282 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 10px;
+            margin: 3rem 0;
+        }
+
+        .cognitive-objectives h3 {
+            color: white;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .cognitive-objectives ul {
+            list-style: none;
+            padding-left: 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cognitive-objectives li {
+            margin-bottom: 1rem;
+            padding-left: 1.8rem;
+            position: relative;
+        }
+
+        .cognitive-objectives li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #68d391;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        .page-footer {
+            background-color: var(--color-primary);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: auto;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                width: 100%;
+                position: static;
+                top: auto;
+                max-height: none;
+                border-right: none;
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            .nav-menu {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--color-surface);
+                flex-direction: column;
+                padding: 1rem;
+                border-top: 1px solid var(--color-border);
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .nav-menu li {
+                width: 100%;
+            }
+
+            .module-section {
+                padding: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media print {
+            #main-nav, #sidebar, .page-footer, .hamburger {
+                display: none;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            #content {
+                padding: 0;
+            }
+
+            .module-section {
+                border: none;
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <h1>📘 Module Académique : Infrastructure Réseau Windows Server — Conception, Sécurisation et Gouvernance</h1>
+        <p class="subtitle">Reconstruction académique exhaustive — Maîtrise opérationnelle et raisonnement systémique (Niveau expert 500%+)</p>
+    </header>
+
+    <nav id="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">🌐 Windows Server Network</div>
+            <div class="hamburger" id="hamburger-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu" id="main-menu">
+                <li><a href="#analogie" class="active">Analogie Maître</a></li>
+                <li><a href="#modele-mental">Modèle Mental</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#mecanismes">Mécanismes</a></li>
+                <li><a href="#protocoles">Protocoles & Services</a></li>
+                <li><a href="#illusions">Illusions Conceptuelles</a></li>
+                <li><a href="#raisonnement">Raisonnement</a></li>
+                <li><a href="#synthese">Synthèse</a></li>
+                <li><a href="#extension">Extension</a></li>
+                <li><a href="#objectifs">Objectifs</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside id="sidebar">
+            <div class="sidebar-title">Navigation du Module</div>
+            <ul class="sidebar-nav">
+                <li><a href="#analogie" class="active-section">🧠 Analogie Systémique Maître</a></li>
+                <li><a href="#modele-mental">🧩 Modèle Mental Global</a></li>
+                <li><a href="#architecture">1️⃣ Architecture Conceptuelle Fondamentale</a></li>
+                <li><a href="#mecanismes">2️⃣ Mécanismes Internes — La Machinerie</a></li>
+                <li><a href="#protocoles">3️⃣ Protocoles, Standards & Outils</a></li>
+                <li><a href="#illusions">4️⃣ Illusions Conceptuelles & Pièges Opérationnels</a></li>
+                <li><a href="#raisonnement">5️⃣ Raisonnement de l'Expert Senior</a></li>
+                <li><a href="#synthese">6️⃣ Synthèse Mémorisable Long Terme</a></li>
+                <li><a href="#extension">7️⃣ Extension au-delà du Corpus (500%+)</a></li>
+                <li><a href="#objectifs">🎯 Objectifs Cognitifs Finaux</a></li>
+            </ul>
+        </aside>
+
+        <main id="content">
+            <!-- Section Analogie -->
+            <section id="analogie" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">Analogie Centrale</span>
+                    <h2>🧠 Analogie Systémique Maître — Le Réseau comme Système Postal Universel</h2>
+                </div>
+                <div class="analogy-box">
+                    <p><strong>L'adresse IP</strong> est l'adresse postale complète : elle identifie de manière unique la destination (une maison, un appartement). Le masque de sous-réseau (CIDR) détermine la taille du quartier (le réseau local) et la partie de l'adresse qui désigne la rue (l'ID réseau). La passerelle par défaut est le bureau de poste local qui sait comment acheminer le courrier vers d'autres quartiers ou villes.</p>
+                    <p><strong>Le DNS</strong> est l'annuaire téléphonique universel et hiérarchique. Vous cherchez "boulangerie.centre-ville.fr", l'annuaire vous donne l'adresse postale exacte (l'IP).</p>
+                    <p><strong>Le DHCP</strong> est le facteur qui, à votre arrivée dans un nouveau quartier, vous attribue automatiquement une adresse valide (bail) pour la durée de votre séjour, et vous indique où se trouve le bureau de poste local (passerelle) et comment consulter l'annuaire (DNS).</p>
+                    <p><strong>IPAM</strong> est le cadastre central de la ville. Il sait exactement quelles adresses sont attribuées, à qui, pour combien de temps, et supervise le travail des facteurs (DHCP) et des annuairistes (DNS).</p>
+                    <p><strong>Le VPN</strong> est un tunnel sécurisé et privé creusé à travers les rues publiques d'Internet. DirectAccess est un laissez-passer permanent : le tunnel se crée automatiquement dès que l'employé quitte son domicile (le réseau interne).</p>
+                    <p><strong>DFS</strong> est un système de bibliothèques interconnectées. L'utilisateur va à la "bibliothèque centrale" (l'espace de noms) pour demander un livre. DFS-R fait en sorte qu'une copie de chaque livre soit automatiquement envoyée et mise à jour dans toutes les bibliothèques du réseau.</p>
+                    <p><strong>BranchCache</strong> est une bibliothèque de quartier. Lorsqu'un livre est souvent demandé, une copie est stockée localement (sur un serveur de cache ou sur le PC d'un collègue), évitant à chacun de traverser la ville (le WAN).</p>
+                    <p><strong>Hyper-V et le SDN</strong> sont les architectes et les urbanistes de la ville. Plutôt que de construire des routes et des ponts physiques pour chaque nouveau besoin, ils définissent des plans de circulation logiques (réseaux virtuels), des péages (QoS), des ponts-levis (pare-feu), et des carrefours dynamiques (équilibrage de charge) entièrement via des logiciels. Le <strong>Network Controller</strong> est la mairie centralisée qui orchestre toute cette infrastructure logicielle.</p>
+                </div>
+                <h4>Mapping Explicite</h4>
+                <ul>
+                    <li><span class="concept-key">Adresse postale</span> → Adresse IP (IPv4/IPv6)</li>
+                    <li><span class="concept-key">Quartier</span> → Réseau local (défini par le masque)</li>
+                    <li><span class="concept-key">Bureau de poste local</span> → Passerelle par défaut</li>
+                    <li><span class="concept-key">Annuaire</span> → Serveur DNS</li>
+                    <li><span class="concept-key">Facteur attribuant l'adresse</span> → Serveur DHCP</li>
+                    <li><span class="concept-key">Cadastre de la ville</span> → Serveur IPAM</li>
+                    <li><span class="concept-key">Tunnel privé</span> → Connexion VPN</li>
+                    <li><span class="concept-key">Laissez-passer permanent</span> → DirectAccess</li>
+                    <li><span class="concept-key">Bibliothèque centrale avec index</span> → Espace de noms DFS</li>
+                    <li><span class="concept-key">Copie de livre en local</span> → Réplication DFS / BranchCache</li>
+                    <li><span class="concept-key">Urbaniste logiciel</span> → SDN (Network Controller)</li>
+                </ul>
+            </section>
+
+            <!-- Section Modèle Mental -->
+            <section id="modele-mental" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">Schéma Directeur</span>
+                    <h2>🧩 Modèle Mental Global du Système</h2>
+                </div>
+                <div class="mermaid-diagram">
+                    <div class="mermaid">
+graph TD
+    subgraph Couche_Gouvernance
+        IPAM --> |Supervise et configure| DHCP
+        IPAM --> |Supervise et configure| DNS
+    end
+
+    subgraph Couche_Fondation
+        DHCP --> |Distribue| Adresses_IP
+        DNS --> |Résout| Adresses_IP
+        Adresses_IP --> |Définies par| IPv4_IPv6
+    end
+
+    subgraph Couche_Acces_Donnees
+        DFS_Namespace --> |Fournit un point d'accès unifié| Donnees
+        DFS_Replication --> |Réplique| Donnees
+        BranchCache --> |Met en cache| Donnees
+    end
+
+    subgraph Couche_Acces_Distant
+        VPN --> |Tunnel sécurisé| Utilisateur_Externe
+        DirectAccess --> |Connexion automatique| Utilisateur_Mobile
+        NPS --> |Authentifie et autorise| Utilisateur_Externe
+        NPS --> |Authentifie et autorise| Utilisateur_Mobile
+    end
+
+    subgraph Couche_Abstraction_Virtualisation
+        Hyper_V --> |Héberge| Machines_Virtuelles
+        SDN --> |Virtualise| Reseau_Physique
+        Network_Controller --> |Orchestre| SDN
+        Network_Controller --> |Orchestre| Hyper_V
+    end
+
+    Utilisateur_Local --> |Accède via| DFS_Namespace
+    Utilisateur_Externe --> |Accède via| VPN
+    Utilisateur_Mobile --> |Accède via| DirectAccess
+
+    Donnees --> |Hébergées sur| Serveurs_Fichiers
+    Serveurs_Fichiers --> |Peuvent être| Machines_Virtuelles
+                    </div>
+                </div>
+                <p>Ce diagramme représente l'écosystème fonctionnel : chaque service interagit avec les autres, créant une boucle de régulation où la gouvernance (IPAM) supervise la fondation (IP/DHCP/DNS) et les couches supérieures d'accès aux données et d'accès distant. La virtualisation (SDN/Hyper-V) sert de couche d'abstraction qui permet de déployer et d'orchestrer l'ensemble de manière programmatique.</p>
+            </section>
+
+            <!-- Section Architecture -->
+            <section id="architecture" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">Fondamentaux</span>
+                    <h2>1️⃣ Architecture Conceptuelle Fondamentale</h2>
+                </div>
+                <h3>Rôle Métier et Technique</h3>
+                <p>Ce domaine traite de la <span class="concept-key">mise en place, de la sécurisation et de l'administration d'une infrastructure réseau cohérente</span> sous Windows Server. Son rôle est de garantir que tous les composants d'un système d'information (postes clients, serveurs, services) peuvent communiquer de manière fiable, performante, sécurisée et gérable.</p>
+                
+                <h3>Positionnement dans les Modèles de Référence</h3>
+                <ul>
+                    <li><span class="concept-key">Modèle OSI / TCP/IP</span> : Opérations principales aux couches 3 (Réseau) avec l'adressage IP et le routage, couche 4 (Transport) avec les ports, et couche 7 (Application) avec DNS, DHCP, HTTP, SMB.</li>
+                    <li><span class="concept-key">ITIL</span> : S'inscrit dans la gestion des actifs de service (IPAM), gestion des changements (configuration via GPO, PowerShell), et gestion de la continuité (réplication DFS, clustering DHCP).</li>
+                    <li><span class="concept-key">Zero Trust</span> : Les technologies d'accès distant (VPN, DirectAccess) et d'authentification (NPS, PKI) appliquent le principe de vérification permanente.</li>
+                </ul>
+
+                <h3>Principes Philosophiques Directeurs</h3>
+                <ul>
+                    <li><span class="concept-key">Séparation des préoccupations</span> : DNS public vs privé, séparation des trafics intranet/Internet (DirectAccess).</li>
+                    <li><span class="concept-key">Automatisation avant tout</span> : Privilégier DHCP, GPO, PowerShell, IPAM plutôt que la configuration manuelle.</li>
+                    <li><span class="concept-key">Haute disponibilité par la redondance</span> : Conception multi-serveurs pour DNS, DHCP, DFS.</li>
+                    <li><span class="concept-key">Sécurité par la profondeur</span> : Combinaison pare-feu, authentification forte, DNSSEC, isolation VLAN virtuelle.</li>
+                    <li><span class="concept-key">Abstraction et agilité</span> : Virtualiser l'infrastructure (SDN, Hyper-V) pour découpler configuration logique et topologie physique.</li>
+                </ul>
+            </section>
+
+            <!-- Section Mécanismes -->
+            <section id="mecanismes" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">Fonctionnement Causal</span>
+                    <h2>2️⃣ Mécanismes Internes — La Machinerie</h2>
+                </div>
+                <h3>A. Délivrance d'un bail DHCP (DORA)</h3>
+                <div class="mermaid-diagram">
+                    <div class="mermaid">
+graph LR
+    A[Client: DHCPDISCOVER<br/>Broadcast] --> B[Serveur: DHCPOFFER<br/>Réserve IP]
+    B --> C[Client: DHCPREQUEST<br/>Sélectionne offre]
+    C --> D[Serveur: DHCPACK<br/>Accusé + Bail]
+                    </div>
+                </div>
+                <p><strong>Fonctionnement</strong> : 1) Découverte (broadcast), 2) Offre (réservation temporaire), 3) Sélection (broadcast de confirmation), 4) Accusé (bail final).</p>
+                
+                <h3>B. Résolution DNS récursive</h3>
+                <div class="mermaid-diagram">
+                    <div class="mermaid">
+graph LR
+    A[Client] --> B[Serveur DNS local]
+    B -->|Requête itérative| C[Serveur racine]
+    C -->|Réfère vers .com| D[Serveur TLD .com]
+    D -->|Réfère vers zone| E[Serveur faisant autorité]
+    E -->|Réponse A/AAAA| B
+    B -->|Mise en cache + réponse| A
+                    </div>
+                </div>
+                <p><strong>Principe</strong> : Le serveur DNS local effectue les requêtes itératives pour le client (récursivité) et met en cache le résultat avec un TTL.</p>
+
+                <h3>C. Tunnel VPN (SSTP)</h3>
+                <div class="mermaid-diagram">
+                    <div class="mermaid">
+graph LR
+    A[Client distant] -->|TCP 443 SSL/TLS| B[Serveur VPN]
+    B -->|Authentification MS-CHAPv2/EAP| C[Contrôleur de domaine]
+    B -->|Attribution IP via pool ou DHCP| D[Client]
+    D -->|Trafic intranet encapsulé| B
+                    </div>
+                </div>
+                <p><strong>Spécificité</strong> : Utilise HTTPS (port 443), donc traverse facilement les pare-feux. Chiffrement SSL/TLS.</p>
+            </section>
+
+            <!-- Section Protocoles -->
+            <section id="protocoles" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">Éléments du Système</span>
+                    <h2>3️⃣ Protocoles, Standards & Outils — L'Exhaustivité Technique</h2>
+                </div>
+                <h3>IPv4 & IPv6</h3>
+                <ul>
+                    <li><span class="concept-key">IPv4</span> : 32 bits, notation décimale pointée, masque de sous-réseau, CIDR (/bits). Classes A/B/C historiques, adresses privées (RFC 1918).</li>
+                    <li><span class="concept-key">IPv6</span> : 128 bits, notation hexadécimale, abréviation (::). Types : Global Unicast (2000::/3), Unique Local (FC00::/7), Link-Local (FE80::/10). Mécanismes de transition : ISATAP, 6to4, Teredo.</li>
+                </ul>
+                <h3>DNS</h3>
+                <ul>
+                    <li><span class="concept-key">Types de zones</span> : Primaire (modifiable), Secondaire (copie), Stub (NS/SOA). Intégration AD pour réplication multimaster et mises à jour sécurisées.</li>
+                    <li><span class="concept-key">Enregistrements</span> : A/AAAA, CNAME, MX, NS, SRV, PTR, SOA.</li>
+                    <li><span class="concept-key">Sécurisation</span> : DNSSEC (signature de zone avec ZSK/KSK), cache locking, socket pool randomisé, stratégies DNS (split-brain).</li>
+                </ul>
+                <h3>DHCP & IPAM</h3>
+                <ul>
+                    <li><span class="concept-key">DHCP</span> : Étendues, options, réservations, haute disponibilité (clustering, répartition 80/20), relais DHCP.</li>
+                    <li><span class="concept-key">IPAM</span> : Découverte automatique des serveurs DHCP/DNS/DC, gestion centralisée des plages IP, audit, délégation via groupes de sécurité, approvisionnement par GPO.</li>
+                </ul>
+                <h3>VPN, DirectAccess, NPS</h3>
+                <ul>
+                    <li><span class="concept-key">VPN</span> : Protocoles PPTP (obsolète), L2TP/IPsec, SSTP (HTTPS). Kit CMAK pour créer des installateurs préconfigurés.</li>
+                    <li><span class="concept-key">DirectAccess</span> : Connexion automatique, NRPT (Name Resolution Policy Table), NLS (Network Location Server), séparation du trafic.</li>
+                    <li><span class="concept-key">NPS (RADIUS)</span> : Authentification 802.1x, stratégies réseau, proxy RADIUS, logs d'audit.</li>
+                </ul>
+                <h3>DFS, BranchCache, Déduplication</h3>
+                <ul>
+                    <li><span class="concept-key">DFS-N</span> : Espace de noms basé domaine ou autonome, mode Windows Server 2008 (ABE, plus de cibles).</li>
+                    <li><span class="concept-key">DFS-R</span> : Réplication multimaster avec RDC (Remote Differential Compression), topologies Hub-Spoke/Mesh, gestion des conflits (ConflictAndDeleted).</li>
+                    <li><span class="concept-key">BranchCache</span> : Mode hébergé (serveur de cache) ou distribué (cache client), support SMB/HTTP/BITS.</li>
+                    <li><span class="concept-key">Déduplication</span> : Optimisation par blocs, configurations Default/Hyper-V/Backup, support jusqu'à 64 To sous WS2016.</li>
+                </ul>
+                <h3>Virtualisation Réseau (Hyper-V, SDN)</h3>
+                <ul>
+                    <li><span class="concept-key">vSwitch</span> : Externe, Interne, Privé. SET (Switch Embedded Teaming) pour NIC Teaming intégré.</li>
+                    <li><span class="concept-key">QoS</span> : Gestion bande passante (min/max) et IOPS par VM.</li>
+                    <li><span class="concept-key">VMQ / Dynamic VMQ</span> : Distribution du trafic réseau sur les cœurs CPU.</li>
+                    <li><span class="concept-key">SDN & Network Controller</span> : Virtualisation réseau (NVGRE), Software Load Balancing (SLB), passerelle RAS (BGP), pare-feu distribué.</li>
+                </ul>
+            </section>
+
+            <!-- Section Illusions -->
+            <section id="illusions" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">Pièges à Éviter</span>
+                    <h2>4️⃣ Illusions Conceptuelles & Pièges Opérationnels</h2>
+                </div>
+                <div class="illusion-box">
+                    <h4>Illusion 1 : "Un masque /32 est inutile"</h4>
+                    <p><strong>Pourquoi elle est séduisante</strong> : Un masque avec 32 bits à 1 ne laisse aucune place pour les hôtes.</p>
+                    <p><strong>Pourquoi elle est fausse</strong> : Le masque /32 définit une <span class="concept-key">route hôte</span>, essentielle pour le routage de précision (ex: route statique vers un serveur spécifique). Windows Server 2016 et IPAM supportent désormais /31 et /32.</p>
+                </div>
+                <div class="illusion-box">
+                    <h4>Illusion 2 : "Si je n'arrive pas à joindre un site, le problème vient du DNS"</h4>
+                    <p><strong>Pourquoi elle est séduisante</strong> : Le DNS est la première étape ; nslookup échoue souvent.</p>
+                    <p><strong>Pourquoi elle est fausse</strong> : La résolution DNS peut réussir mais le routage, le pare-feu ou le serveur distant peuvent être en cause. Approche en couches : ping IP, vérifier routage, pare-feu, puis DNS.</p>
+                </div>
+                <div class="illusion-box">
+                    <h4>Illusion 3 : "La réplication DFS assure une disponibilité immédiate"</h4>
+                    <p><strong>Pourquoi elle est séduisante</strong> : Les données apparaissent sur l'autre serveur après création.</p>
+                    <p><strong>Pourquoi elle est fausse</strong> : La réplication initiale peut être longue (surtout sur WAN). En conflit, seul le dernier changement est conservé, l'autre est déplacé dans ConflictAndDeleted.</p>
+                </div>
+                <div class="illusion-box">
+                    <h4>Illusion 4 : "IPAM crée une réservation et l'enregistrement DNS de manière atomique"</h4>
+                    <p><strong>Pourquoi elle est séduisante</strong> : La case "Créer automatiquement des enregistrements DNS" est cochée.</p>
+                    <p><strong>Pourquoi elle est fausse</strong> : IPAM exécute deux opérations distinctes via RPC/WMI. Des permissions insuffisantes peuvent créer une incohérence (réservation sans enregistrement DNS).</p>
+                </div>
+            </section>
+
+            <!-- Section Raisonnement -->
+            <section id="raisonnement" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">Méthode Expert</span>
+                    <h2>5️⃣ Raisonnement de l'Expert Senior — Pensée Systémique Appliquée</h2>
+                </div>
+                <h3>Anticiper les Impacts en Chaîne</h3>
+                <p>Exemple : modification de la passerelle par défaut sur un serveur DNS.</p>
+                <ul>
+                    <li><span class="concept-key">Impact primaire</span> : Le serveur utilise la nouvelle passerelle.</li>
+                    <li><span class="concept-key">Impact secondaire</span> : Erreurs de connectivité vers des services distants si la table de routage est différente.</li>
+                    <li><span class="concept-key">Impact tertiaire</span> : Les clients dépendant de ce serveur DNS perdent la résolution de noms → tout le domaine peut être paralysé.</li>
+                </ul>
+                <h3>Diagnostiquer par Hypothèses Réfutables</h3>
+                <p>Approche structurée pour un problème de connexion VPN :</p>
+                <ol>
+                    <li>Recueil des faits : Échec d'authentification.</li>
+                    <li>Hypothèses : mot de passe erroné, compte verrouillé, serveur injoignable, protocole bloqué, certificat expiré.</li>
+                    <li>Test : ping serveur (réussite), telnet sur port 443 (échec) → pare-feu bloque.</li>
+                    <li>Résolution : correction de la règle de pare-feu.</li>
+                </ol>
+                <h3>Lire les Signaux Faibles</h3>
+                <ul>
+                    <li>Événements DNS ID 4013 : problème de réplication.</li>
+                    <li>Baux DHCP non renouvelés : pool saturé ou serveur injoignable.</li>
+                    <li>Enregistrements DNS avec horodatage ancien : nettoyage (scavenging) mal configuré.</li>
+                    <li>Augmentation du trafic WAN sur site avec BranchCache : cache purgé ou stratégie non appliquée.</li>
+                </ul>
+            </section>
+
+            <!-- Section Synthèse -->
+            <section id="synthese" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">À Retenir Absolument</span>
+                    <h2>6️⃣ Synthèse Mémorisable Long Terme — Le Code Mental</h2>
+                </div>
+                <h3>Lois Invariantes du Domaine</h3>
+                <div class="law-box">
+                    <p>1. <strong>Toute communication a un coût</strong> : latence, bande passante, charge CPU.</p>
+                    <p>2. <strong>L'identité est fondamentale</strong> : sans IP et DNS, pas de communication.</p>
+                    <p>3. <strong>La configuration est plus fragile que le code</strong> : l'automatisation (DHCP, GPO, IPAM) est la clé.</p>
+                    <p>4. <strong>La sécurité est un processus, pas un état</strong> : certificats, CRL, mises à jour, DNSSEC.</p>
+                    <p>5. <strong>L'abstraction apporte de l'agilité, mais aussi de la complexité</strong> : SDN et Hyper-V exigent une compréhension des couches physique et virtuelle.</p>
+                </div>
+                <h3>Équations Mentales</h3>
+                <div class="equation-box">
+                    <p><strong>Performance perçue</strong> = (Latence_Accès_Stockage + Temps_Résolution_DNS) × (1 / Bande_Passante_Effective)</p>
+                    <p><strong>Risque de panne DNS</strong> = (Nombre de serveurs DNS) × (TTL moyen)</p>
+                    <p><strong>Sécurité VPN</strong> = Force_Chiffrement (AES-256) + Robustesse_Authentification (Certificats) + Intégrité_Client</p>
+                </div>
+                <h3>Retour à l'Analogie Centrale</h3>
+                <div class="analogy-box">
+                    <p>Vous êtes l'architecte du système postal universel. Vous garantissez que chaque lettre (paquet) :</p>
+                    <ul>
+                        <li>Peut être adressée n'importe où (IP)</li>
+                        <li>Arrive intacte et en ordre si nécessaire (TCP)</li>
+                        <li>Est lisible seulement par le destinataire (TLS)</li>
+                        <li>Trouve son chemin même si une route est coupée (BGP/OSPF)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section Extension -->
+            <section id="extension" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">Perspectives</span>
+                    <h2>7️⃣ Extension au-delà du Corpus (500%+)</h2>
+                </div>
+                <h3>L'Internet Géopolitique : La Fracture en Cours</h3>
+                <div class="mermaid-diagram">
+                    <div class="mermaid">
+graph TB
+    subgraph "Vers un 'Splinternet'?"
+        US[Internet US] -->|Concurrence| EU[Internet UE<br/>GDPR]
+        US -->|Conflit| CN[Internet Chinois<br/>Grand Firewall]
+        EU -->|Tensions| RU[Internet Russe<br/>RuNet]
+    end
+                    </div>
+                </div>
+                <h3>L'Avenir : Internet 2030+</h3>
+                <ul>
+                    <li><span class="concept-key">QUIC (HTTP/3)</span> : HTTP sur UDP, réduction de latence, déjà 30% du trafic.</li>
+                    <li><span class="concept-key">IPv6 Adoption</span> : ~40% global, élimine le NAT.</li>
+                    <li><span class="concept-key">Zero Trust Networking</span> : Authentification et chiffrement même en interne.</li>
+                    <li><span class="concept-key">Réseaux Maillés et Satellites</span> : Starlink, latence 20ms partout.</li>
+                </ul>
+                <h3>Limites Physiques Fondamentales</h3>
+                <div class="analogy-box">
+                    <p><strong>La vitesse de la lumière</strong> : limite absolue. Paris-Sydney = 81ms minimum. La latence définit l'expérience utilisateur plus que le débit.</p>
+                </div>
+            </section>
+
+            <!-- Section Objectifs -->
+            <section id="objectifs" class="module-section">
+                <div class="section-header">
+                    <span class="section-tag">Finalité</span>
+                    <h2>🎯 Objectifs Cognitifs Finaux — Maîtrise Opérationnelle</h2>
+                </div>
+                <div class="cognitive-objectives">
+                    <p>À la fin de ce module, vous ne voyez plus l'infrastructure réseau comme une somme de composants, mais comme un <span class="concept-key">système vivant interconnecté</span>. Vous comprenez simultanément :</p>
+                    <ul>
+                        <li>Les mécanismes d'adressage, de résolution et d'automatisation (IPv4, IPv6, DNS, DHCP)</li>
+                        <li>La gouvernance centralisée via IPAM et les politiques de groupe</li>
+                        <li>Les tunnels d'accès distant sécurisés (VPN, DirectAccess) et l'authentification RADIUS</li>
+                        <li>L'organisation des données avec DFS, BranchCache et la déduplication</li>
+                        <li>La virtualisation réseau et l'orchestration par SDN et Network Controller</li>
+                    </ul>
+                    <p>Vous pouvez diagnostiquer une panne en remontant les couches, anticiper les impacts d'un changement, et concevoir une infrastructure résiliente, sécurisée et évolutive.</p>
+                    <p><strong>Votre nouveau superpouvoir</strong> : Vous ne configurez plus des serveurs isolément. Vous orchestrez un écosystème où chaque service (IP, DNS, DHCP, VPN, DFS, SDN) s'auto-régule et participe à la résilience globale.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="page-footer">
+        <p>Module Académique Infrastructure Réseau Windows Server — Reconstruction pour la Maîtrise Expert 500%+</p>
+        <p>© Format pédagogique HTML — Contenu figé et validé.</p>
+    </footer>
+
+    <script>
+        // Script pour la navigation mobile et le suivi des sections actives
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger-btn');
+            const mainMenu = document.getElementById('main-menu');
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            const mainNavLinks = document.querySelectorAll('.nav-menu a');
+
+            // Gestion du menu hamburger
+            hamburger.addEventListener('click', function() {
+                mainMenu.classList.toggle('active');
+            });
+
+            // Fermer le menu mobile en cliquant sur un lien
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (mainMenu.classList.contains('active')) {
+                        mainMenu.classList.remove('active');
+                    }
+                });
+            });
+
+            // Suivi de la section active (scroll)
+            const sections = document.querySelectorAll('.module-section');
+            const navLi = document.querySelectorAll('.sidebar-nav a, .nav-menu a');
+
+            function setActiveSection() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 150;
+                    const sectionHeight = section.clientHeight;
+                    if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLi.forEach(li => {
+                    li.classList.remove('active', 'active-section');
+                    if (li.getAttribute('href') === `#${current}`) {
+                        li.classList.add('active', 'active-section');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', setActiveSection);
+            // Initialiser l'état actif au chargement
+            setActiveSection();
+        });
+    </script>
+</body>
+</html>
